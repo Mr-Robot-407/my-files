@@ -1,0 +1,138 @@
+// Queue using Singly Linked List
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the node structure
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Define the queue structure to hold front and rear pointers
+struct Queue {
+    struct Node* front;
+    struct Node* rear;
+};
+
+// Function to initialize an empty queue
+struct Queue* createQueue() {
+    struct Queue* q = (struct Queue*)malloc(sizeof(struct Queue));
+    q->front = q->rear = NULL;
+    return q;
+}
+
+// Check if the queue is empty
+int isEmpty(struct Queue* q) {
+    return (q->front == NULL);
+}
+
+// Add an element to the rear of the queue (Enqueue)
+void enqueue(struct Queue* q, int value) {
+    // Create a new node
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed! Heap Overflow.\n");
+        return;
+    }
+    newNode->data = value;
+    newNode->next = NULL;
+
+    // If the queue is empty, new node becomes both front and rear
+    if (q->rear == NULL) {
+        q->front = q->rear = newNode;
+        printf("%d enqueued to queue.\n", value);
+        return;
+    }
+
+    // Add the new node at the end of the queue and update rear
+    q->rear->next = newNode;
+    q->rear = newNode;
+    printf("%d enqueued to queue.\n", value);
+}
+
+// Remove an element from the front of the queue (Dequeue)
+void dequeue(struct Queue* q) {
+    // Check for queue underflow
+    if (isEmpty(q)) {
+        printf("Queue Underflow! The queue is empty.\n");
+        return;
+    }
+
+    // Store the previous front node to free it later
+    struct Node* temp = q->front;
+    printf("%d dequeued from queue.\n", temp->data);
+
+    // Move front pointer to the next node
+    q->front = q->front->next;
+
+    // If front becomes NULL, set rear to NULL as well (queue is now empty)
+    if (q->front == NULL) {
+        q->rear = NULL;
+    }
+    free(temp);
+}
+
+// Get the front element of the queue (Peek)
+int peek(struct Queue* q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty.\n");
+        return -1;
+    }
+    return q->front->data;
+}
+
+// Display all elements in the queue
+void display(struct Queue* q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty.\n");
+        return;
+    }
+    
+    struct Node* temp = q->front;
+    printf("Queue elements: ");
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    struct Queue* q = createQueue();
+    int choice, value;
+
+    printf("--- Queue Using Linked List Menu ---\n");
+    printf("1. Enqueue\n2. Dequeue\n3. Peek\n4. Display\n5. Exit\n");
+
+    while (1) {
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the value to enqueue: ");
+                scanf("%d", &value);
+                enqueue(q, value);
+                break;
+            case 2:
+                dequeue(q);
+                break;
+            case 3:
+                value = peek(q);
+                if (value != -1) {
+                    printf("Front element is: %d\n", value);
+                }
+                break;
+            case 4:
+                display(q);
+                break;
+            case 5:
+                printf("Exiting program.\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please enter a valid option.\n");
+        }
+    }
+    return 0;
+}

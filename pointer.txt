@@ -1,0 +1,13 @@
+#include <stdio.h>
+int main() 
+{
+    int arr[5] = {10, 20, 30, 40, 50};
+    int *ptr = arr; // ptr points to &arr[0]
+    printf("Displaying array elements using pointer arithmetic:\n");
+    for (int i = 0; i < 5; i++) 
+    {
+        // *(ptr + i) accesses value; (ptr + i) accesses memory address
+        printf("Element %d: %d (at address: %p)\n", i, *(ptr + i), (void*)(ptr + i));
+    }
+    return 0;
+}

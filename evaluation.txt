@@ -1,0 +1,67 @@
+// Evaluation of Postfix Expression using Stack
+
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+// Stack definition
+int stack[MAX];
+int top = -1;
+
+// Function to push an item to the stack
+void push(int val) {
+    if (top >= MAX - 1) {
+        printf("Stack Overflow\n");
+        exit(1);
+    }
+    stack[++top] = val;
+}
+
+// Function to pop an item from the stack
+int pop() {
+    if (top < 0) {
+        printf("Stack Underflow\n");
+        exit(1);
+    }
+    return stack[top--];
+}
+
+// Function to evaluate the postfix expression
+int evaluatePostfix(char* exp) {
+    for (int i = 0; exp[i] != '\0'; i++) {
+        // If the character is a digit, convert to int and push
+        if (isdigit(exp[i])) {
+            push(exp[i] - '0');
+        } 
+        // If the character is an operator, pop two operands
+        else {
+            int val1 = pop(); // Right operand
+            int val2 = pop(); // Left operand
+            
+            switch (exp[i]) {
+                case '+': push(val2 + val1); break;
+                case '-': push(val2 - val1); break;
+                case '*': push(val2 * val1); break;
+                case '/': push(val2 / val1); break;
+                default: 
+                    printf("Unsupported operator: %c\n", exp[i]);
+                    exit(1);
+            }
+        }
+    }
+    return pop(); // Final evaluated result
+}
+
+int main() {
+    char exp[MAX];
+    
+    printf("Enter postfix expression (e.g., 231*+9-): ");
+    scanf("%s", exp);
+    
+    int result = evaluatePostfix(exp);
+    printf("Result of the evaluation: %d\n", result);
+    
+    return 0;
+}

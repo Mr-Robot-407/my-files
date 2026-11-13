@@ -1,0 +1,105 @@
+// Primitive operations on Queue using arrays
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define SIZE 5 // Maximum capacity of the queue
+
+// Function declarations
+void enqueue(int value);
+void dequeue();
+void display();
+void peek();
+
+int queue[SIZE];
+int front = -1;
+int rear = -1;
+
+int main() {
+    int choice, value;
+
+    while (1) {
+        printf("\n--- QUEUE MENU ---");
+        printf("\n1. Enqueue (Insert)");
+        printf("\n2. Dequeue (Delete)");
+        printf("\n3. Peek (Front Element)");
+        printf("\n4. Display Queue");
+        printf("\n5. Exit");
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value to insert: ");
+                scanf("%d", &value);
+                enqueue(value);
+                break;
+            case 2:
+                dequeue();
+                break;
+            case 3:
+                peek();
+                break;
+            case 4:
+                display();
+                break;
+            case 5:
+                printf("Exiting program.\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please select a valid option.\n");
+        }
+    }
+    return 0;
+}
+
+// Add an element to the rear of the queue
+void enqueue(int value) {
+    if (rear == SIZE - 1) {
+        printf("Queue Overflow! Cannot insert %d.\n", value);
+    } else {
+        if (front == -1) {
+            front = 0; // Initialize front pointer on first insertion
+        }
+        rear++;
+        queue[rear] = value;
+        printf("Inserted %d successfully.\n", value);
+    }
+}
+
+// Remove an element from the front of the queue
+void dequeue() {
+    if (front == -1 || front > rear) {
+        printf("Queue Underflow! Nothing to delete.\n");
+    } else {
+        printf("Deleted element: %d\n", queue[front]);
+        front++;
+        
+        // Reset pointers if the queue becomes entirely empty
+        if (front > rear) {
+            front = rear = -1;
+        }
+    }
+}
+
+// View the front element without removing it
+void peek() {
+    if (front == -1 || front > rear) {
+        printf("Queue is empty.\n");
+    } else {
+        printf("Element at the front is: %d\n", queue[front]);
+    }
+}
+
+// Print all active elements inside the queue
+void display() {
+    if (front == -1 || front > rear) {
+        printf("Queue is empty.\n");
+    } else {
+        printf("Queue elements are: ");
+        for (int i = front; i <= rear; i++) {
+            printf("%d ", queue[i]);
+        }
+        printf("\n");
+    }
+}

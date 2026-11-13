@@ -1,0 +1,138 @@
+// Priority Queue Program
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+// Parallel arrays to store data and priorities without using structures
+int data_arr[MAX];
+int priority_arr[MAX];
+int rear = -1; // Tracks the back of the queue
+
+// Function declarations
+void enqueue(int data, int priority);
+int dequeue();
+int peek();
+void display();
+int isEmpty();
+int isFull();
+
+int main() {
+    int choice, data, priority;
+
+    while (1) {
+        printf("\n--- Priority Queue Menu ---\n");
+        printf("1. Enqueue (Insert)\n");
+        printf("2. Dequeue (Delete Highest Priority)\n");
+        printf("3. Peek (View Highest Priority)\n");
+        printf("4. Display Queue\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Exiting.\n");
+            break;
+        }
+
+        switch (choice) {
+            case 1:
+                if (isFull()) {
+                    printf("Queue Overflow! Cannot insert more elements.\n");
+                } else {
+                    printf("Enter data element (integer): ");
+                    scanf("%d", &data);
+                    printf("Enter its priority (lower integer = higher priority): ");
+                    scanf("%d", &priority);
+                    enqueue(data, priority);
+                }
+                break;
+            case 2:
+                if (isEmpty()) {
+                    printf("Queue Underflow! The queue is empty.\n");
+                } else {
+                    int removed_element = dequeue();
+                    printf("Dequeued element: %d\n", removed_element);
+                }
+                break;
+            case 3:
+                if (isEmpty()) {
+                    printf("Queue is empty.\n");
+                } else {
+                    int highest_idx = peek();
+                    printf("Highest priority element is %d with priority %d\n", 
+                           data_arr[highest_idx], priority_arr[highest_idx]);
+                }
+                break;
+            case 4:
+                display();
+                break;
+            case 5:
+                printf("Exiting program.\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please select a valid option.\n");
+        }
+    }
+    return 0;
+}
+
+// Check if the queue is full
+int isFull() {
+    return (rear == MAX - 1);
+}
+
+// Check if the queue is empty
+int isEmpty() {
+    return (rear == -1);
+}
+
+// Insert an element into the priority queue (Unordered Array insertion)
+void enqueue(int data, int priority) {
+    rear++;
+    data_arr[rear] = data;
+    priority_arr[rear] = priority;
+    printf("Successfully inserted [%d] with priority [%d]\n", data, priority);
+}
+
+// Find index of highest priority element (lower integer value = higher priority)
+int peek() {
+    int highest_priority = priority_arr[0];
+    int highest_index = 0;
+
+    for (int i = 1; i <= rear; i++) {
+        if (priority_arr[i] < highest_priority) {
+            highest_priority = priority_arr[i];
+            highest_index = i;
+        }
+    }
+    return highest_index;
+}
+
+// Remove the element with highest priority and shift remaining elements
+int dequeue() {
+    int index = peek();
+    int removed_item = data_arr[index];
+
+    // Shift all elements after the removed item one position to the left
+    for (int i = index; i < rear; i++) {
+        data_arr[i] = data_arr[i + 1];
+        priority_arr[i] = priority_arr[i + 1];
+    }
+    
+    rear--; // Reduce queue size
+    return removed_item;
+}
+
+// Display elements currently in the queue
+void display() {
+    if (isEmpty()) {
+        printf("Queue is empty.\n");
+        return;
+    }
+    printf("\nCurrent Priority Queue Elements:\n");
+    printf("Data\tPriority\n");
+    for (int i = 0; i <= rear; i++) {
+        printf("%d\t%d\n", data_arr[i], priority_arr[i]);
+    }
+}
