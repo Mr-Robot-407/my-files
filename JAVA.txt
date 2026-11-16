@@ -1,0 +1,326 @@
+import java.util.LinkedList; 
+import java.util.Queue; 
+  
+class SharedBuffer { 
+    private final Queue<Integer> buffer = new LinkedList<>(); 
+    private final int CAPACITY = 5; 
+  
+    public synchronized void produce(int value) throws InterruptedException { 
+        while (buffer.size() == CAPACITY) { 
+            System.out.println("Buffer full. Producer waiting..."); 
+            wait(); 
+        } 
+        buffer.add(value); 
+        System.out.println("Produced: " + value); 
+        notify();  // wake up a waiting consumer 
+    } 
+  
+    public synchronized int consume() throws InterruptedException { 
+        while (buffer.isEmpty()) { 
+            System.out.println("Buffer empty. Consumer waiting..."); 
+            wait(); 
+        } 
+        int value = buffer.poll(); 
+        System.out.println("Consumed: " + value); 
+        notify();  // wake up a waiting producer 
+        return value; 
+    } 
+} 
+  
+class Producer implements Runnable { 
+    private SharedBuffer sharedBuffer; 
+  
+    Producer(SharedBuffer sharedBuffer) { 
+        this.sharedBuffer = sharedBuffer; 
+    } 
+  
+    public void run() { 
+        try { 
+            for (int i = 1; i <= 8; i++) { 
+                sharedBuffer.produce(i); 
+                Thread.sleep(30); 
+            } 
+        } catch (InterruptedException e) { 
+            Thread.currentThread().interrupt(); 
+        } 
+    } 
+} 
+  
+class Consumer implements Runnable { 
+    private SharedBuffer sharedBuffer; 
+  
+    Consumer(SharedBuffer sharedBuffer) { 
+        this.sharedBuffer = sharedBuffer; 
+    } 
+  
+    public void run() { 
+        try { 
+OOPS WITH JAVA LAB MANUAL 
+Page 13 
+            for (int i = 1; i <= 8; i++) { 
+                sharedBuffer.consume(); 
+                Thread.sleep(60); 
+            } 
+        } catch (InterruptedException e) { 
+            Thread.currentThread().interrupt(); 
+        } 
+    } 
+} 
+  
+public class Lab6 { 
+    public static void main(String[] args) throws InterruptedException { 
+        SharedBuffer sharedBuffer = new SharedBuffer(); 
+  
+        Thread producerThread = new Thread(new Producer(sharedBuffer), "Producer"); 
+        Thread consumerThread = new Thread(new Consumer(sharedBuffer), "Consumer"); 
+  
+        producerThread.start(); 
+        consumerThread.start(); 
+  
+        producerThread.join(); 
+        consumerThread.join(); 
+  
+        System.out.println("Producer-Consumer demonstration complete."); 
+    } 
+} 
+--------------------------------------------------------------------------------
+
+import javafx.application.Application; 
+import javafx.scene.Scene; 
+import javafx.scene.control.*; 
+import javafx.scene.layout.VBox; 
+import javafx.stage.Stage; 
+public class ControlsDemo extends Application { 
+    @Override 
+    public void start(Stage stage) { 
+        Label nameLabel = new Label("Enter your name:"); 
+        TextField nameField = new TextField(); 
+        Label outputLabel = new Label(); 
+        Button button = new Button("Submit"); 
+        button.setOnAction(e -> { 
+            String name = nameField.getText(); 
+            if (name.isEmpty()) { 
+                Alert alert = new Alert(Alert.AlertType.WARNING); 
+                alert.setTitle("Warning"); 
+                alert.setHeaderText(null); 
+                alert.setContentText("Please enter your name!"); 
+                alert.showAndWait(); 
+            } else { 
+                outputLabel.setText("Welcome, " + name + "!"); 
+                Alert alert = new Alert(Alert.AlertType.INFORMATION); 
+                alert.setTitle("Message"); 
+                alert.setHeaderText("Success"); 
+                alert.setContentText("Your name was submitted successfully."); 
+                alert.showAndWait(); 
+            } 
+        }); 
+        VBox root = new VBox(10); 
+        root.getChildren().addAll( 
+            nameLabel, nameField, button, outputLabel 
+        ); 
+        Scene scene = new Scene(root, 350, 250); 
+        stage.setTitle("Student Greeting Application"); 
+        stage.setScene(scene); 
+        stage.show(); 
+    } 
+    public static void main(String[] args) { 
+        launch(args); 
+    } 
+} 
+---------------------------------------------------------------------------------------------------
+
+import javafx.application.Application; 
+import javafx.scene.Scene; 
+import javafx.scene.control.*; 
+import javafx.scene.layout.*; 
+import javafx.stage.Stage; 
+public class layoutDemo extends Application { 
+    @Override 
+    public void start(Stage stage) { 
+        Label nameLabel = new Label("Name:"); 
+        TextField nameField = new TextField(); 
+        Button submitButton = new Button("Submit"); 
+        HBox topLayout = new HBox(10); 
+        topLayout.getChildren().addAll( 
+            nameLabel, nameField, submitButton 
+        ); 
+        Label message = new Label("Welcome to JavaFX Layouts!"); 
+        Button button1 = new Button("Button 1"); 
+        Button button2 = new Button("Button 2"); 
+        VBox centerLayout = new VBox(15); 
+        centerLayout.getChildren().addAll( 
+            message, button1, button2 
+        ); 
+        BorderPane root = new BorderPane(); 
+        root.setTop(topLayout); 
+        root.setCenter(centerLayout); 
+        Scene scene = new Scene(root, 450, 250); 
+        stage.setTitle("JavaFX Layout Demonstration"); 
+        stage.setScene(scene); 
+        stage.show(); 
+    } 
+    public static void main(String[] args) { 
+        launch(args); 
+    } 
+}
+-----------------------------------------------------------------------------------------
+  
+import java.util.ArrayList; 
+import java.util.LinkedList; 
+import java.util.HashSet; 
+import java.util.Collections; 
+import java.util.Iterator; 
+  
+public class Lab9 { 
+    public static void main(String[] args) { 
+  
+        // ---------- ArrayList ---------- 
+        System.out.println("---- ArrayList Operations ----"); 
+        ArrayList<String> arrayList = new ArrayList<>(); 
+        arrayList.add("Apple"); 
+        arrayList.add("Banana"); 
+        arrayList.add("Mango"); 
+        arrayList.add("Grapes"); 
+        System.out.println("Initial ArrayList: " + arrayList); 
+  
+        arrayList.add(1, "Orange");             // insert at index 
+        System.out.println("After insert at index 1: " + arrayList); 
+  
+        arrayList.remove("Banana");             // remove by value 
+        System.out.println("After removing Banana: " + arrayList); 
+  
+        Collections.sort(arrayList);            // sort 
+        System.out.println("After sorting: " + arrayList); 
+  
+        System.out.println("Element at index 2: " + arrayList.get(2)); 
+        System.out.println("Size of ArrayList: " + arrayList.size()); 
+        System.out.println("Contains 'Mango'? " + arrayList.contains("Mango")); 
+  
+        // ---------- LinkedList ---------- 
+        System.out.println("\n---- LinkedList Operations ----"); 
+        LinkedList<Integer> linkedList = new LinkedList<>(); 
+        linkedList.add(10); 
+        linkedList.add(20); 
+        linkedList.add(30); 
+        linkedList.addFirst(5);                 // add at beginning 
+        linkedList.addLast(40);                 // add at end 
+        System.out.println("LinkedList: " + linkedList); 
+  
+        linkedList.removeFirst(); 
+        linkedList.removeLast(); 
+        System.out.println("After removing first & last: " + linkedList); 
+  
+        System.out.println("First element: " + linkedList.getFirst()); 
+        System.out.println("Last element: " + linkedList.getLast()); 
+  
+        Iterator<Integer> it = linkedList.iterator(); 
+        System.out.print("Iterating LinkedList: "); 
+        while (it.hasNext()) { 
+            System.out.print(it.next() + " "); 
+        } 
+        System.out.println(); 
+  
+        // ---------- HashSet ---------- 
+        System.out.println("\n---- HashSet Operations ----"); 
+        HashSet<String> hashSet = new HashSet<>(); 
+OOPS WITH JAVA LAB MANUAL 
+Page 23 
+        hashSet.add("Red"); 
+        hashSet.add("Green"); 
+        hashSet.add("Blue"); 
+        hashSet.add("Red");   // duplicate - will be ignored 
+        System.out.println("HashSet (duplicates ignored): " + hashSet); 
+  
+        System.out.println("Contains 'Green'? " + hashSet.contains("Green")); 
+        hashSet.remove("Blue"); 
+        System.out.println("After removing 'Blue': " + hashSet); 
+        System.out.println("Size of HashSet: " + hashSet.size()); 
+  
+        System.out.print("Iterating HashSet: "); 
+        for (String color : hashSet) { 
+            System.out.print(color + " "); 
+        } 
+        System.out.println(); 
+    } 
+} 
+---------------------------------------------------------------------------------------
+
+  
+import java.io.*; 
+  
+class Student implements Serializable { 
+    int rollNo; 
+    String name; 
+    double marks; 
+  
+    Student(int rollNo, String name, double marks) { 
+        this.rollNo = rollNo; 
+        this.name = name; 
+        this.marks = marks; 
+    } 
+  
+    @Override 
+    public String toString() { 
+        return rollNo + "," + name + "," + marks; 
+    } 
+} 
+  
+public class Lab10 { 
+    public static void main(String[] args) { 
+        String fileName = "students.txt"; 
+  
+        // ---- Sequential Write ---- 
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) { 
+            Student[] students = { 
+                new Student(1, "Nethravathi", 88.5), 
+                new Student(2, "Kusumitha", 91.0), 
+                new Student(3, "Govind", 76.25) 
+            }; 
+            for (Student s : students) { 
+                bw.write(s.toString()); 
+                bw.newLine(); 
+            } 
+            System.out.println("Records written sequentially to " + fileName); 
+        } catch (IOException e) { 
+            System.out.println("Error writing to file: " + e.getMessage()); 
+        } 
+  
+        // ---- Sequential Read (record by record, in order) ---- 
+        System.out.println("\nReading records sequentially:"); 
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) { 
+            String line; 
+            int recordNum = 1; 
+            while ((line = br.readLine()) != null) { 
+                String[] fields = line.split(","); 
+                System.out.println("Record " + recordNum + " -> Roll No: " + fields[0] 
+                        + ", Name: " + fields[1] + ", Marks: " + fields[2]); 
+                recordNum++; 
+            } 
+        } catch (IOException e) { 
+            System.out.println("Error reading file: " + e.getMessage()); 
+        } 
+  
+        // ---- Append a new record (sequential access continues at end) ---- 
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, true))) { 
+OOPS WITH JAVA LAB MANUAL 
+Page 25 
+            Student s4 = new Student(4, "Ramesh", 82.0); 
+            bw.write(s4.toString()); 
+            bw.newLine(); 
+            System.out.println("\nAppended new record: " + s4); 
+        } catch (IOException e) { 
+            System.out.println("Error appending to file: " + e.getMessage()); 
+        } 
+  
+        // ---- Read again to confirm the append ---- 
+        System.out.println("\nFinal file contents (sequential read):"); 
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) { 
+            String line; 
+            while ((line = br.readLine()) != null) { 
+                System.out.println(line); 
+            } 
+        } catch (IOException e) { 
+            System.out.println("Error reading file: " + e.getMessage()); 
+        } 
+    } 
+} 
