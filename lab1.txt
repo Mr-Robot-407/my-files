@@ -1,0 +1,19 @@
+#!/bin/bash
+for i in $*
+do
+if [ -d $i ]
+then
+echo "large file size is"
+echo `ls -Rl $1 | grep "^-" | tr -s ' ' | cut -d ' ' -f 5,9 | sort -n | tail -1`
+else
+echo "Not a directory "
+fi
+done
+---------------------------------------
+#!/bin/bash
+if [ $# -ne 1 ]; then
+echo "Usage: $0 <path>"
+exit 1
+fi
+mkdir -p "$1"
+echo "Directories created successfully."

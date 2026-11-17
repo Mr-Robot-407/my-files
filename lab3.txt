@@ -1,0 +1,47 @@
+#!/bin/bash
+echo "enter the file name"
+read file
+if [ -f $file ]; then
+set -- `ls -l $file`
+echo "file permission $1"
+echo "number of links $2"
+echo "user name $3"
+echo "group name $4"
+echo "file size $5 bytes"
+echo "date of modification $6 $7"
+echo "time of modification $8"
+echo "name of file $9"
+else
+echo "file doesnot exit"
+fi
+---------------------------------------
+#!/bin/bash
+trap '' 2 20 3
+stty -echo eof undef
+
+echo -n "Enter password to lock terminal: "
+read -r pass1
+echo
+echo -n "Re-enter password to confirm:"
+read -r pass2
+echo
+
+if [ "$pass1" != "$pass2" ]; then
+echo "Passwords do not match! Terminal not locked."
+stty echo eof '^D'
+exit 1
+fi
+
+echo "Terminal is locked."
+while true; do
+echo -n "Enter password to unlock: "
+read -r pass_try
+echo
+if [ "$pass_try" = "$pass1" ]; then
+echo "Terminal unlocked successfully."
+break
+else
+echo "Incorrect password. Try again."
+fi
+done
+stty echo eof '^D'

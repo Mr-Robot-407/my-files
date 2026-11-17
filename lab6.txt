@@ -1,0 +1,40 @@
+#!/bin/bash
+if [ $# -eq 0 ]; then
+echo "Usage : $0 <pat1> <pat2> "
+exit 1
+fi
+DEST_DIR="$HOME/mydir"
+mkdir -p "$DEST_DIR"
+
+for pattern in "$@"; do
+echo "Searching for pattern : $pattern"
+for file in "$HOME"/$pattern; do
+if [ -f "$file" ]; then
+echo "File: $file"
+echo "File contents are"
+cat "$file"
+cp -f "$file" "$DEST_DIR/"
+echo "Copied '$file' to $DEST_DIR/"
+echo
+else
+echo "No matching regular files found"
+fi
+done
+done
+---------------------------------------
+#!/bin/bash
+if [ $# -lt 1 ]; then
+echo "Pass atleast one file"
+exit 1
+fi
+destinationToSearch="$1"
+for file in "$destinationToSearch"/*
+do
+if [ -f $file ] ; then
+filename=$(basename $file)
+fileNameLength=`expr length $filename`
+if [ $fileNameLength -gt 10 ]; then
+echo "File Found: $filename"
+fi
+fi
+done

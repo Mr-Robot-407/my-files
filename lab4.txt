@@ -1,0 +1,20 @@
+#!/bin/bash
+if [ $# -le 0 ]; then
+echo "Arguments are not entered"
+else
+for file in $*
+do
+echo "Original Name: $file"
+newname=$(echo -n "$file" |tr "[a-z]" "[A-Z]")
+mv "$file" "$newname"
+echo "New names: $newname"
+done
+fi
+---------------------------------------
+#!/bin/bash
+file="$1"
+dir="${2:-.}"
+set -- $(ls -i "$file")
+inode="$1"
+echo "$inode"
+find "$dir" -inum "$inode"

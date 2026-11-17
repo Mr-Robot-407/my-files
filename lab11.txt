@@ -1,0 +1,28 @@
+#!/usr/bin/awk -f
+BEGIN { print "TOTAL NUMBER OF BOOKS SOLD IN EACH CATEGORY" }
+{ books[$1] += $2 }
+END {
+for (item in books) {
+print item, "=", books[item]
+total += books[item]
+}
+print "total books sold =", total
+}
+---------------------------------------
+#!/usr/bin/awk -f
+BEGIN {
+FS = ","
+print "EMPLOYEE SALARY"
+print "ID", "NAME", "BASIC", "HRA", "DA", "GROSS SAL"
+}
+NR > 1 {
+if ($4 < 10000) {
+hra = $4 * 0.15
+da = $4 * 0.45
+} else {
+hra = $4 * 0.20
+da = $4 * 0.50
+}
+gross = $4 + hra + da
+print $1, $2, $4, hra, da, gross
+}
