@@ -1,0 +1,303 @@
+class Main {
+    public static void main(String[] args) {
+        StringBuilder sharedString = new StringBuilder("Maharaja");
+        Thread childThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (sharedString) {
+                    sharedString.append(" Mysore");
+                    System.out.println("Child Thread: Concatenated string is \""
+                            + sharedString + "\"");
+                    sharedString.notify();
+                }
+            }
+        });
+        childThread.start();
+        synchronized (sharedString) {
+            try {
+                sharedString.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            String upperCaseString = sharedString.toString().toUpperCase();
+            System.out.println("Main Thread: Uppercase string is \""
+                    + upperCaseString + "\"");
+        }
+    }
+}
+--------------------------------------------------------------------------------
+// Data.java
+class Data {
+    private int value;
+    private boolean available = false;
+
+    synchronized void produce(int value) {
+        while (available) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                System.out.println(e);
+            }
+        }
+        this.value = value;
+        available = true;
+        System.out.println("Produced: " + value);
+        notify();
+    }
+
+    synchronized void consume() {
+        while (!available) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                System.out.println(e);
+            }
+        }
+        available = false;
+        System.out.println("Consumed: " + value);
+        notify();
+    }
+}
+
+// Producer.java
+public class Producer implements Runnable {
+    Data data;
+    Producer(Data data) {
+        this.data = data;
+    }
+    @Override
+    public void run() {
+        for (int i = 1; i <= 5; i++) {
+            data.produce(i);
+        }
+    }
+}
+
+// Consumer.java
+public class Consumer implements Runnable {
+    Data data;
+    Consumer(Data data) {
+        this.data = data;
+    }
+    @Override
+    public void run() {
+        for (int i = 1; i <= 5; i++) {
+            data.consume();
+        }
+    }
+}
+
+// PC.java
+public class PC {
+    public static void main(String[] args) {
+        Data data = new Data();
+        Thread producer = new Thread(new Producer(data));
+        Thread consumer = new Thread(new Consumer(data));
+        producer.start();
+        consumer.start();
+    }
+}
+--------------------------------------------------------------------------------
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class SimpleUIDemo extends Application {
+    @Override
+    public void start(Stage stage) {
+        TextField firstField = new TextField();
+        firstField.setPromptText("Enter first number");
+        TextField secondField = new TextField();
+        secondField.setPromptText("Enter second number");
+        Button addButton = new Button("Add");
+        Label resultLabel = new Label("Result: ");
+        TextField resultField = new TextField();
+        resultField.setEditable(false);
+
+        addButton.setOnAction(e -> {
+            try {
+                double a = Double.parseDouble(firstField.getText());
+                double b = Double.parseDouble(secondField.getText());
+                double sum = a + b;
+                resultLabel.setText("Result: " + sum);
+                resultField.setText(String.valueOf(sum));
+                Alert info = new Alert(AlertType.INFORMATION);
+                info.setTitle("Success");
+                info.setHeaderText(null);
+                info.setContentText("The sum is " + sum);
+                info.showAndWait();
+            } catch (NumberFormatException ex) {
+                firstField.clear();
+                secondField.clear();
+                resultField.clear();
+                resultLabel.setText("Result: ");
+                firstField.requestFocus();
+                Alert error = new Alert(AlertType.ERROR);
+                error.setTitle("Invalid Input");
+                error.setHeaderText(null);
+                error.setContentText("Please enter valid numbers in both fields.");
+                error.showAndWait();
+            }
+        });
+
+        VBox root = new VBox(10, firstField, secondField, addButton, resultLabel, resultField);
+        root.setPadding(new Insets(20));
+        root.setAlignment(Pos.CENTER);
+        stage.setScene(new Scene(root, 320, 300));
+        stage.setTitle("Simple UI Demo");
+        stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+--------------------------------------------------------------------------------
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+public class Layout25 extends Application {
+    public void start(Stage stage) {
+        Label status = new Label("Click any button");
+        HBox top = new HBox(10, new Label("HBox:"), new Button("A"), new Button("B"));
+        top.setPadding(new Insets(10));
+        top.setAlignment(Pos.CENTER);
+
+        VBox left = new VBox(10, new Label("VBox:"), new Button("C"), new Button("D"));
+        left.setPadding(new Insets(10));
+        left.setAlignment(Pos.TOP_CENTER);
+
+        FlowPane right = new FlowPane(5, 5, new Label("Flow:"), new Button("E"), new Button("F"), new Button("G"));
+        right.setPadding(new Insets(10));
+        right.setPrefWrapLength(90);
+        right.setAlignment(Pos.TOP_CENTER);
+
+        Button ok = new Button("OK");
+        ok.setOnAction(e -> status.setText("OK clicked"));
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(10));
+        grid.setAlignment(Pos.CENTER);
+        grid.add(new Label("Name"), 0, 0);
+        grid.add(new TextField(), 1, 0);
+        grid.add(ok, 1, 1);
+
+        StackPane bottom = new StackPane(status);
+        bottom.setPadding(new Insets(10));
+        bottom.setStyle("-fx-background-color: lightblue;");
+
+        BorderPane root = new BorderPane(grid, top, right, bottom, left);
+        stage.setScene(new Scene(root, 500, 250));
+        stage.setTitle("Layout Demo");
+        stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+--------------------------------------------------------------------------------
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+
+public class CollectionsDemo {
+    public static void main(String[] args) {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("Java");
+        list.add("Python");
+        list.add("C++");
+        list.add(1, "Kotlin");
+        list.set(0, "JavaFX");
+        list.remove("C++");
+        System.out.println("ArrayList: " + list);
+        System.out.println("Size: " + list.size());
+        System.out.println("Contains Python? " + list.contains("Python"));
+        System.out.println("Index of Kotlin: " + list.indexOf("Kotlin"));
+        try {
+            System.out.println(list.get(10));
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Error: invalid index");
+        }
+
+        LinkedList<Integer> linked = new LinkedList<>();
+        linked.add(20);
+        linked.add(30);
+        linked.addFirst(10);
+        linked.addLast(40);
+        linked.removeFirst();
+        System.out.println("\nLinkedList: " + linked);
+        System.out.println("First: " + linked.getFirst());
+        System.out.println("Last: " + linked.getLast());
+
+        HashSet<String> set = new HashSet<>();
+        System.out.println("\nAdd Apple: " + set.add("Apple"));
+        System.out.println("Add Banana: " + set.add("Banana"));
+        System.out.println("Add Apple again: " + set.add("Apple"));
+        set.remove("Banana");
+        System.out.println("HashSet: " + set);
+        System.out.println("Contains Apple? " + set.contains("Apple"));
+
+        System.out.println("\nLoop through ArrayList:");
+        for (String s : list) {
+            System.out.println(s);
+        }
+    }
+}
+--------------------------------------------------------------------------------
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class SerialFileDemo {
+    public static void main(String[] args) {
+        String fileName = "students.txt";
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            writer.write("Asha");
+            writer.newLine();
+            writer.write("Ravi");
+            writer.newLine();
+            writer.write("Meena");
+            writer.newLine();
+            System.out.println("Data written successfully.");
+        } catch (IOException e) {
+            System.out.println("Write error: " + e.getMessage());
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+            writer.write("Kiran");
+            writer.newLine();
+            System.out.println("Data appended successfully.");
+        } catch (IOException e) {
+            System.out.println("Append error: " + e.getMessage());
+        }
+
+        System.out.println("\nFile contents:");
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Read error: " + e.getMessage());
+        }
+    }
+}
